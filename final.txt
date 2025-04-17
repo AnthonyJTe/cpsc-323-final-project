@@ -1,1 +1,19 @@
+program s2025;
+//This program computes and prints the value
+    of some expressions//
+var
+    // declare variables //
+    a1 ,    b2s ,   ar, bb  : integer ;
+begin
+      a1         = 3 ;
+        bb= 23 ;
+       b2s =      4 ;
+        ar      = 5  ;
+        a1 =  2*a1+ ar*( b2s + bb);
+    show ( a1 ); // display a1 //
 
+        //compute the value of this expression //
+        bb = a1 * ( b2s + 2 * ar) ;
+        show ( “value=”, bb ) ; //print the value of bb //
+
+  end
