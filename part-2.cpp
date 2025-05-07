@@ -7,7 +7,7 @@
 #include <cctype>
 // for this case E' and T' are Q and K respectfully
 std::map<std::string, std::map<std::string, std::string>> predictiveTable = {
-    {"P", {{"program", "program I ; var L begin C end ."}}},
+    {"P", {{"program", "program I ; var L begin C end"}}},
     {"I", {{"a", "Z J"}, {"b", "Z J"}, {"r", "Z J"}, {"s", "Z J"}}},
     {"J", {
         {"a", "Z J"}, {"b", "Z J"}, {"r", "Z J"}, {"s", "Z J"},
@@ -23,11 +23,13 @@ std::map<std::string, std::map<std::string, std::string>> predictiveTable = {
     {"H", {{"show", "S H"}, {"a", "S H"}, {"b", "S H"}, {"r", "S H"}, {"s", "S H"}, {"end", ""}}},
     {"S", {{"show", "W"}, {"a", "A"}, {"b", "A"}, {"r", "A"}, {"s", "A"}}},
     {"W", {{"show", "show ( R I ) ;"}}},
-    {"R", {{"\"value=\"", "\"value=\""}, {"a", ""}, {"b", ""}, {"r", ""}, {"s", ""}}},
+    {"R", {{"\"value=\"", "\"value =\""}, {"a", ""}, {"b", ""}, {"r", ""}, {"s", ""}}},
     {"A", {{"a", "I = E ;"}, {"b", "I = E ;"}, {"r", "I = E ;"}, {"s", "I = E ;"}}},
-    {"E", {{"(", "T Q"}, {"a", "T Q"}, {"b", "T Q"}, {"r", "T Q"}, {"s", "T Q"}}},
+    {"E", {{"(", "T Q"}, {"a", "T Q"}, {"b", "T Q"}, {"r", "T Q"}, {"s", "T Q"} , {"1", "T Q"}, {"2", "T Q"},
+           {"3", "T Q"}, {"4", "T Q"}, {"5", "T Q"}, {"6", "T Q"}, {"7", "T Q"}, {"8", "T Q"}, {"9", "T Q"}}},
     {"Q", {{")", ""}, {";", ""}, {"+", "+ T Q"}, {"-", "- T Q"}}},
-    {"T", {{"(", "F K"}, {"a", "F K"}, {"b", "F K"}, {"r", "F K"}, {"s", "F K"}}},
+    {"T", {{"(", "F K"}, {"a", "F K"}, {"b", "F K"}, {"r", "F K"}, {"s", "F K"}, {"1", "F K"}, {"2", "F K"},
+           {"3", "F K"}, {"4", "F K"}, {"5", "F K"}, {"6", "F K"}, {"7", "F K"}, {"8", "F K"}, {"9", "F K"}}},
     {"K", {{")", ""}, {"+", ""}, {"-", ""}, {";", ""}, {"*", "* F K"}, {"/", "/ F K"}}},
     {"F", {
         {"a", "I"}, {"b", "I"}, {"r", "I"}, {"s", "I"},
@@ -43,7 +45,8 @@ std::map<std::string, std::map<std::string, std::string>> predictiveTable = {
         {"0", "Y M"}, {"1", "Y M"}, {"2", "Y M"}, {"3", "Y M"}, {"4", "Y M"},
         {"5", "Y M"}, {"6", "Y M"}, {"7", "Y M"}, {"8", "Y M"}, {"9", "Y M"}
     }},
-    {"X", {{"+", "+"}, {"-", "-"}}},
+    {"X", {{"+", "+"}, {"-", "-"},{"0", ""}, {"1", ""}, {"2", ""}, {"3", ""}, {"4", ""},
+           {"5", ""}, {"6", ""}, {"7", ""}, {"8", ""}, {"9", ""}}},
     {"Y", {
         {"0", "0"}, {"1", "1"}, {"2", "2"}, {"3", "3"}, {"4", "4"},
         {"5", "5"}, {"6", "6"}, {"7", "7"}, {"8", "8"}, {"9", "9"}
@@ -80,6 +83,7 @@ std::vector<std::string> symbolize(std::string input) {
             input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/' ||
             input[i] == '(' || input[i] == ')') {
             current += input[i];
+            std::cout << "Symbolize: " << current << std::endl;
             symbols.push_back(current);
         } else if (input[i] == '"') {
             current += input[i];
@@ -92,6 +96,7 @@ std::vector<std::string> symbolize(std::string input) {
                 current += input[i];
             }
             if (current == "\"value=\"") {
+                std::cout << "Symbolize: " << current << std::endl;
                 symbols.push_back(current);
             }
         } else if (std::isalnum(input[i])) {
@@ -102,15 +107,15 @@ std::vector<std::string> symbolize(std::string input) {
                 j++;
             }
             i = j - 1;
+            std::cout << "Symbolize: " << current << std::endl;
             if (current == "program" || current == "var" || current == "begin" ||
                 current == "end" || current == "integer" || current == "show") {
                 symbols.push_back(current);
-            } else if (current == "end") {
+            } else if (current == "\"value=\"") {
+                std::cout << "Symbolize: " << current << std::endl;
                 symbols.push_back(current);
-            } else if (isLetter(current[0])) {
-                symbols.push_back(current);
-            } else if (isDigit(current[0])) {
-                symbols.push_back(current);
+            } else {
+                for (char i : current) symbols.push_back(std::string(1, i));
             }
         }
     }
@@ -126,8 +131,8 @@ bool parse(std::vector<std::string>& symbols, size_t& index) {
     while (!stack.empty() && index < symbols.size()) {
         std::string top = stack.top();
         std::string current = symbols[index];
-        if (top == current || (top == "Z" && isLetter(current[0])) ||
-            (top == "Y" && isDigit(current[0])) || (top == "I" && declaredVars.find(current) != declaredVars.end())) {
+        std::cout << "Stack top: " << top << ", current symbol: " << current << std::endl;
+        if (top == current) {
             stack.pop();
             if (top == "I" && declaredVars.find(current) == declaredVars.end()) {
                 std::cout << "Some Errors: unknown identifier\n";
@@ -189,6 +194,7 @@ bool parse(std::vector<std::string>& symbols, size_t& index) {
             } else {
                 std::cout << "Some Errors: syntax error\n";
             }
+            std::cout << "Error: No match found for " << top << " and " << current << std::endl;
             break;
         }
     }
