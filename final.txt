@@ -14,6 +14,6 @@ begin
 
         //compute the value of this expression //
         bb = a1 * ( b2s + 2 * ar) ;
-        show ( “value=”, bb ) ; //print the value of bb //
+        show ( "value=", bb ) ; //print the value of bb //
 
   end

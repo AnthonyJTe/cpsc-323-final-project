@@ -23,7 +23,7 @@ std::map<std::string, std::map<std::string, std::string>> predictiveTable = {
     {"H", {{"show", "S H"}, {"a", "S H"}, {"b", "S H"}, {"r", "S H"}, {"s", "S H"}, {"end", ""}}},
     {"S", {{"show", "W"}, {"a", "A"}, {"b", "A"}, {"r", "A"}, {"s", "A"}}},
     {"W", {{"show", "show ( R I ) ;"}}},
-    {"R", {{"\"value=\"", "\"value =\""}, {"a", ""}, {"b", ""}, {"r", ""}, {"s", ""}}},
+    {"R", {{"\"value=\"", "\"value=\" ,"}, {"a", ""}, {"b", ""}, {"r", ""}, {"s", ""}}},
     {"A", {{"a", "I = E ;"}, {"b", "I = E ;"}, {"r", "I = E ;"}, {"s", "I = E ;"}}},
     {"E", {{"(", "T Q"}, {"a", "T Q"}, {"b", "T Q"}, {"r", "T Q"}, {"s", "T Q"} , {"1", "T Q"}, {"2", "T Q"},
            {"3", "T Q"}, {"4", "T Q"}, {"5", "T Q"}, {"6", "T Q"}, {"7", "T Q"}, {"8", "T Q"}, {"9", "T Q"}}},
@@ -68,8 +68,16 @@ bool isDigit(char c) {
 std::vector<std::string> symbolize(std::string input) {
     std::vector<std::string> symbols;
     std::string current;
+    std::string cleanInput;
+    for (char ch : input) {
+        if (static_cast<unsigned char>(ch) < 128) {  // ASCII range
+            cleanInput += ch;
+        }
+    }
+    input = cleanInput;  // Replace original input with cleaned ASCII-only version
     bool inComment = false;
     for (size_t i = 0; i < input.size(); ++i) {
+        // std::cout << "Processing: [" << input[i] << "] (ASCII: " << static_cast<int>(input[i]) << ")" << std::endl;
         if (input[i] == '*' && i + 1 < input.size() && input[i + 1] == '*') {
             inComment = !inComment;
             i++;
@@ -83,7 +91,7 @@ std::vector<std::string> symbolize(std::string input) {
             input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/' ||
             input[i] == '(' || input[i] == ')') {
             current += input[i];
-            std::cout << "Symbolize: " << current << std::endl;
+            // std::cout << "Symbolize: " << current << std::endl;
             symbols.push_back(current);
         } else if (input[i] == '"') {
             current += input[i];
@@ -95,10 +103,9 @@ std::vector<std::string> symbolize(std::string input) {
             if (i < input.size()) {
                 current += input[i];
             }
-            if (current == "\"value=\"") {
-                std::cout << "Symbolize: " << current << std::endl;
-                symbols.push_back(current);
-            }
+            // debugging
+            // std::cout << "Symbolize: " << current << std::endl;
+            symbols.push_back(current);  // Store all quoted strings
         } else if (std::isalnum(input[i])) {
             current += input[i];
             size_t j = i + 1;
@@ -107,12 +114,12 @@ std::vector<std::string> symbolize(std::string input) {
                 j++;
             }
             i = j - 1;
-            std::cout << "Symbolize: " << current << std::endl;
+            // std::cout << "Symbolize: " << current << std::endl;
             if (current == "program" || current == "var" || current == "begin" ||
                 current == "end" || current == "integer" || current == "show") {
                 symbols.push_back(current);
             } else if (current == "\"value=\"") {
-                std::cout << "Symbolize: " << current << std::endl;
+                // std::cout << "Symbolize: " << current << std::endl;
                 symbols.push_back(current);
             } else {
                 for (char i : current) symbols.push_back(std::string(1, i));
@@ -131,7 +138,7 @@ bool parse(std::vector<std::string>& symbols, size_t& index) {
     while (!stack.empty() && index < symbols.size()) {
         std::string top = stack.top();
         std::string current = symbols[index];
-        std::cout << "Stack top: " << top << ", current symbol: " << current << std::endl;
+        // std::cout << "Stack top: " << top << ", current symbol: " << current << std::endl;
         if (top == current) {
             stack.pop();
             if (top == "I" && declaredVars.find(current) == declaredVars.end()) {
@@ -194,7 +201,7 @@ bool parse(std::vector<std::string>& symbols, size_t& index) {
             } else {
                 std::cout << "Some Errors: syntax error\n";
             }
-            std::cout << "Error: No match found for " << top << " and " << current << std::endl;
+            // std::cout << "Error: No match found for " << top << " and " << current << std::endl;
             break;
         }
     }

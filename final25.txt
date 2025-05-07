@@ -9,5 +9,5 @@ ar = 5 ;
 a1 = 2 * a1 + ar * ( b2s + bb ) ;
 show ( a1 ) ;
 bb = a1 * ( b2s + 2 * ar ) ;
-show ( “value=” , bb ) ;
+show ( "value=" , bb ) ;
 end

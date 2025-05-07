@@ -1,7 +1,7 @@
 import re
 
 def clean_file(input_path, output_path):
-    with open(input_path, 'r', encoding='utf-8') as infile:
+    with open(input_path, 'r') as infile:
         lines = infile.readlines()
 
     cleaned_lines = []
@@ -28,7 +28,7 @@ def clean_file(input_path, output_path):
 
         cleaned_lines.append(cleaned_line)
 
-    with open(output_path, 'w', encoding='utf-8') as outfile:
+    with open(output_path, 'w') as outfile:
         for line in cleaned_lines:
             outfile.write(line + '\n')
 
