@@ -1,3 +1,5 @@
+import os
+
 def translate_line(line):
     line = line.strip().rstrip(';')
     if line.startswith(('program', 'var', 'begin', 'end')):
@@ -17,3 +19,5 @@ python_code = '\n'.join(filter(None, translated_lines))
 
 with open("translated.py", "w") as py_file:
     py_file.write(python_code)
+
+os.system("python3 translated.py")
