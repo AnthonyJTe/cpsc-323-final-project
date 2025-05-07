@@ -105,7 +105,7 @@ std::vector<std::string> symbolize(std::string input) {
             if (current == "program" || current == "var" || current == "begin" ||
                 current == "end" || current == "integer" || current == "show") {
                 symbols.push_back(current);
-            } else if (current == "end.") {
+            } else if (current == "end") {
                 symbols.push_back(current);
             } else if (isLetter(current[0])) {
                 symbols.push_back(current);
@@ -172,7 +172,7 @@ bool parse(std::vector<std::string>& symbols, size_t& index) {
                 std::cout << "Some Errors: var is expected\n";
             } else if (top == "begin") {
                 std::cout << "Some Errors: begin is expected\n";
-            } else if (top == "end.") {
+            } else if (top == "end") {
                 std::cout << "Some Errors: end is expected\n";
             } else if (top == "integer") {
                 std::cout << "Some Errors: integer is expected\n";
@@ -200,7 +200,7 @@ bool parse(std::vector<std::string>& symbols, size_t& index) {
 }
 
 int main() {
-    std::ifstream file("final.txt");
+    std::ifstream file("final25.txt");
     std::string input, line;
     while (std::getline(file, line)) {
         input += line + "\n";
